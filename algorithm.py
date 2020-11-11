@@ -63,7 +63,6 @@ def connected_edges(edge_a: str, edge_b: str) -> str:
     if vertex in vertex_encodings:
         return vertex
     return None
-    #return get_complement_encoding("{}{}".format(edge_a[10:],edge_b[:10])) in vertex_encodings
 
 def is_valid_path(edge_list: list) -> list:
     """ Determine if a list of string encodings for edges is a valid path through the directed graph """
@@ -102,11 +101,9 @@ def generate_all_possible_solutions(edge_encodings: set, possible_solutions: lis
         edge_bank.append(edge)
         edge_bank.append(edge)
     
-    min_size = 2 #max(2, len(edge_encodings)-2)
+    min_size = 2
     max_size = len(edge_encodings) + 2
-    print(len(edge_encodings))
     for i in range(min_size, max_size):
-        print(i)
         for perm in permutations(edge_bank, i):
             possible_solution = is_valid_path(perm)
             if possible_solution:
