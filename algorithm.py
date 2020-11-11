@@ -20,7 +20,7 @@ base_mapping = {
 
 def usage():
     print("""
-usage: {} graph.json start_vertex end_vertex
+Usage: {} graph.json start_vertex end_vertex
     """.format(sys.argv[0]))
     sys.exit(0)
 
