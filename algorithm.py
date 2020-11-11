@@ -68,11 +68,26 @@ def connected_edges(edge_a: str, edge_b: str) -> str:
 def is_valid_path(edge_list: list) -> list:
     """ Determine if a list of string encodings for edges is a valid path through the directed graph """
     path = []
+    # add first vertex
+    partial_vertex = get_complement_encoding(edge_list[0][:10])
+    if partial_vertex not in partial_vertex_encodings:
+        return None
+    for vertex in vertex_encodings:
+        if partial_vertex == vertex[10:]:
+            path.append(vertex)
+    # add middle vertices
     for i in range(len(edge_list)-1):
         vertex = connected_edges(edge_list[i],edge_list[i+1])
         if not vertex:
             return None
         path.append(vertex)
+    # add last vertex
+    partial_vertex = get_complement_encoding(edge_list[-1][10:])
+    if partial_vertex not in partial_vertex_encodings:
+        return None
+    for vertex in vertex_encodings:
+        if partial_vertex == vertex[:10]:
+            path.append(vertex)
     return path
 
 def generate_all_possible_solutions(edge_encodings: set, possible_solutions: list) -> None:
@@ -87,7 +102,7 @@ def generate_all_possible_solutions(edge_encodings: set, possible_solutions: lis
         edge_bank.append(edge)
         edge_bank.append(edge)
     
-    min_size = max(2, len(edge_encodings)-2)
+    min_size = 2 #max(2, len(edge_encodings)-2)
     max_size = len(edge_encodings) + 2
     print(len(edge_encodings))
     for i in range(min_size, max_size):
@@ -133,6 +148,15 @@ def eliminate_missing_vertex(possible_solutions: list, vertex_encodings: set)-> 
     for bad_solution in solutions_to_remove:
         possible_solutions.remove(bad_solution)
 
+def vertex_list_human_readable(vertex_list: list) -> str:
+    """ Return a human readable path from a strand of vertices """
+    human_readable = ""
+    for v in vertex_list:
+        for vm in vertex_mapping:
+            if vertex_mapping[vm] == v:
+                human_readable = "{}{}".format(human_readable,vm)
+    return human_readable
+
 
 if __name__ == '__main__':
     if(len(sys.argv) != 4):
@@ -146,6 +170,10 @@ if __name__ == '__main__':
     print("Creating DNA strands for vertices and edges")
     get_all_vertex(graph, vertex_mapping)
     generate_all_edges(graph, edge_encodings)
+
+    print("The following are vertex encodings")
+    for v in vertex_mapping:
+        print("{}: 5' {} 3'".format(v,vertex_mapping[v]))
 
     print("Generating strands encompassing all possible solutions")
     generate_all_possible_solutions(edge_encodings, possible_solutions)
@@ -163,10 +191,14 @@ if __name__ == '__main__':
     print("Eliminating strands that don't include every vertex")
     eliminate_missing_vertex(possible_solutions, vertex_encodings)
 
+    hamil_paths = set()
     if possible_solutions:
         print("YES, this is a valid Hamiltonian path")
         print("Valid Solutions:")
         for soln in possible_solutions:
-            print("".join(soln))
+            hamil_paths.add(tuple(soln))
+        for hamil in hamil_paths:
+            print("".join(hamil))
+            print(vertex_list_human_readable(hamil))
     else:
         print("NO, this is not a valid Hamiltonian path")
